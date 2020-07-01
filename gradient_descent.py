@@ -27,15 +27,15 @@ def hyper_to_k_sim(nu, lambda_h):
     k = tang_kernel(graphs[:50])
     d = np.diag(k)**-0.5
     k_sim = np.diag(d).dot(k).dot(np.diag(d))
-    
+
     return k_sim
 
 
 def get_partials(hypers, mean0, beta):
-    partial_derivatives = []       
+    partial_derivatives = []
     for i, hyper_value in enumerate(hypers):
         delta_hyper = hyper_value/beta
-        
+
         hypers1 = hypers.copy()
         hypers1[i] += delta_hyper
         k_sim1 = hyper_to_k_sim(*hypers1)
@@ -70,7 +70,7 @@ def check_bounds(hypers, bounds):
     return new_hyper
 
 
-if __name__ is " __main__":
+if __name__ == '__main__':
     # establish starting point 
     # legend: [nu, lambda]
     hypers =  [.3, .1]
@@ -78,23 +78,23 @@ if __name__ is " __main__":
     # establish bounds for hypers
     bounds = [(0,1), (0,float('inf'))]
 
-    alpha = .1     # learning rate
+    alpha = 10    # learning rate
     beta = 100     # size of hyperparameter differential, delta_h=h/beta
 
-    for iteration in range(10):
+    for iteration in range(50):
         print('Hypers:   ', hypers)
 
         # calculate 
         k_sim0 = hyper_to_k_sim(*hypers)
         mean0  = k_sim_to_mean(k_sim0)
         print('Mean:     ', mean0)
-        
+
         # produce partial derivatives:
         partial_derivatives = get_partials(hypers, mean0, beta)
         print('Partials: ', partial_derivatives)
-        
+
         # update hypers
-        hypers = list(map( (lambda hyp,part:hyp-alpha*part), hypers, 
+        hypers = list(map( (lambda hyp,part:hyp-alpha*part), hypers,
                         partial_derivatives))
         hypers = check_bounds(hypers, bounds)
 
