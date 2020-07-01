@@ -55,28 +55,48 @@ def k_sim_to_mean(k_sim):
     flat = k_sim.flatten()
     return np.mean(flat)
 
+def check_bounds(hypers, bounds):
+    # checks if hypers are within the ranges specified by bounds.
+    # if not, it changes the hyperprameter to be at the boundary.
+    # it returns the potntially modified list of hyperparameters, leaving
+    # the original unchanged.
+    new_hyper = []
+    for hyper, bound in zip(hypers, bounds):
+        if hyper < bound[0]:
+            hyper = bound[0]
+        if hyper > bound[1]:
+            hyper = bound[1]
+        new_hyper.append(hyper)
+    return new_hyper
 
-# establish starting point (legend: [nu, lambda])
-hypers = [.3, .1]
 
-alpha = .1     # learning rate
-beta = 100     # size of hyperparameter differential, delta_h=h/beta
+if __name__ is " __main__":
+    # establish starting point 
+    # legend: [nu, lambda]
+    hypers =  [.3, .1]
 
-for iteration in range(10):
-    print('Hypers:   ', hypers)
+    # establish bounds for hypers
+    bounds = [(0,1), (0,float('inf'))]
 
-    # calculate 
-    k_sim0 = hyper_to_k_sim(*hypers)
-    mean0  = k_sim_to_mean(k_sim0)
-    print('Mean:     ', mean0)
-    
-    # produce partial derivatives:
-    partial_derivatives = get_partials(hypers, mean0, beta)
-    print('Partials: ', partial_derivatives)
-    
-    # update hypers
-    hypers = list(map( (lambda hyp,part:hyp-alpha*part), hypers, 
+    alpha = .1     # learning rate
+    beta = 100     # size of hyperparameter differential, delta_h=h/beta
+
+    for iteration in range(10):
+        print('Hypers:   ', hypers)
+
+        # calculate 
+        k_sim0 = hyper_to_k_sim(*hypers)
+        mean0  = k_sim_to_mean(k_sim0)
+        print('Mean:     ', mean0)
+        
+        # produce partial derivatives:
+        partial_derivatives = get_partials(hypers, mean0, beta)
+        print('Partials: ', partial_derivatives)
+        
+        # update hypers
+        hypers = list(map( (lambda hyp,part:hyp-alpha*part), hypers, 
                         partial_derivatives))
+        hypers = check_bounds(hypers, bounds)
 
 
 
