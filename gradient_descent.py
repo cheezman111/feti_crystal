@@ -7,10 +7,17 @@ import pandas as pd
 import graphdot
 import pickle
 import graphdot.kernel.molecular as gkern
+import random
 
 # import data from feti_filtered.dat
 with open("feti_graphs.dat", "rb") as input_file:
     graphs = pickle.load(input_file)
+
+# import second data from feti_filtered.dat for randomization
+with open("feti_graphs.dat", "rb") as input_file:
+    graphs_random = pickle.load(input_file)
+random.shuffle(graphs_random)
+
 
 # returns a normalized k matrix given a set of hyperparameters.
 def hyper_to_k_sim(nu, lambda_h):
@@ -51,21 +58,23 @@ def k_sim_to_variance(k_sim):
     flat = k_sim.flatten()
     return np.var(flat)
 
+
 def k_sim_to_mean(k_sim):
     flat = k_sim.flatten()
     return np.mean(flat)
 
-def check_bounds(hypers, bounds):
+
+def check_bounds(hypers, bounds, beta):
     # checks if hypers are within the ranges specified by bounds.
-    # if not, it changes the hyperprameter to be at the boundary.
+    # if not, it changes the hyperprameter to be just before the boundary.
     # it returns the potntially modified list of hyperparameters, leaving
     # the original unchanged.
     new_hyper = []
     for hyper, bound in zip(hypers, bounds):
         if hyper < bound[0]:
-            hyper = bound[0]
+            hyper = bound[0] + np.abs(hyper/beta)
         if hyper > bound[1]:
-            hyper = bound[1]
+            hyper = bound[1] - np.abs(hyper/beta)
         new_hyper.append(hyper)
     return new_hyper
 
@@ -82,6 +91,7 @@ if __name__ == '__main__':
     beta = 100     # size of hyperparameter differential, delta_h=h/beta
 
     for iteration in range(50):
+        print('Iteration: ', iteration)
         print('Hypers:   ', hypers)
 
         # calculate 
@@ -96,7 +106,7 @@ if __name__ == '__main__':
         # update hypers
         hypers = list(map( (lambda hyp,part:hyp-alpha*part), hypers,
                         partial_derivatives))
-        hypers = check_bounds(hypers, bounds)
-
+        hypers = check_bounds(hypers, bounds, beta)
+        print()
 
 
