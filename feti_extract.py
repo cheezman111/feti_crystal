@@ -1,7 +1,7 @@
 # This script takes data from the 2013 VASP FeTi data set, after being filtered
 # by grep. File: fet_filtered.dat. It produces graphdot graphs for each
 # snapshot, adds them to a list and stores them in a file called
-# 'feti_graphs.dat'.
+# 'feti_graphs.dat'. It was originally filtered from the OUTCAR file.
 from ase import Atoms
 import graphdot
 import pickle

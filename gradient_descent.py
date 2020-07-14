@@ -8,6 +8,8 @@ import graphdot
 import pickle
 import graphdot.kernel.molecular as gkern
 import random
+from matplotlib.pyplot import plot, draw, show
+
 
 # import data from feti_filtered.dat
 with open("feti_graphs.dat", "rb") as input_file:
@@ -82,14 +84,15 @@ def check_bounds(hypers, bounds, beta):
 if __name__ == '__main__':
     # establish starting point 
     # legend: [nu, lambda]
-    hypers =  [.3, .1]
+    hypers =  [0.24940064654666944, 0.0030006889798517445]
 
     # establish bounds for hypers
     bounds = [(0,1), (0,float('inf'))]
 
-    alpha = 10    # learning rate
+    alpha = .1    # learning rate
     beta = 100     # size of hyperparameter differential, delta_h=h/beta
 
+    means_history = []
     for iteration in range(50):
         print('Iteration: ', iteration)
         print('Hypers:   ', hypers)
@@ -97,6 +100,7 @@ if __name__ == '__main__':
         # calculate 
         k_sim0 = hyper_to_k_sim(*hypers)
         mean0  = k_sim_to_mean(k_sim0)
+        means_history.append(mean0)
         print('Mean:     ', mean0)
 
         # produce partial derivatives:
